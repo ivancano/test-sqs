@@ -1,0 +1,36 @@
+service: testsqs
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  sendMsg:
+    handler: handlers/handlerSendMsg.sendMsg
+    events:
+      - http:
+          path: message/send
+          method: post
+      - sqs:
+          arn: arn:aws:sqs:region:us-east-1:MessagesQueue
+  receiveMsg:
+    handler: handlers/handlerReceiveMsg.receiveMsg
+    events:
+      - http:
+          path: message/receive
+          method: post
+      - sqs:
+          arn: arn:aws:sqs:region:us-east-1:MessagesQueue
+
+resources:
+  Resources:
+    MessagesQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: MessagesQueue
+
+plugins:
+  - serverless-offline-lambda
+  - serverless-offline
